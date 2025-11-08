@@ -1,0 +1,219 @@
+<!DOCTYPE html><html lang="en" data-astro-cid-37fxchfa> <head><meta charset="UTF-8"><meta name="description" property="og:description" content="How I stopped fearing malloc and learned to love the heap.
+"><meta name="viewport" content="width=device-width"><meta name="generator" content="Astro v5.15.4"><title>Baby, lemme alloc</title><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,400;0,700;1,400&family=Rubik:wght@500;600&display=swap" rel="stylesheet"><script>
+	// This code is inlined in the head to make dark mode instant & blocking.
+	const getThemePreference = () => {
+		if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+			return localStorage.getItem('theme');
+		}
+		return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+	};
+	const isDark = getThemePreference() === 'dark';
+	document.documentElement.classList[isDark ? 'add' : 'remove']('theme-dark');
+
+	if (typeof localStorage !== 'undefined') {
+		// Watch the document element and persist user preference when it changes.
+		const observer = new MutationObserver(() => {
+			const isDark = document.documentElement.classList.contains('theme-dark');
+			localStorage.setItem('theme', isDark ? 'dark' : 'light');
+		});
+		observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+	}
+</script><link rel="stylesheet" href="/_astro/about.J6YDj6DV.css">
+<style>.pill[data-astro-cid-2qeywk4b]{display:flex;padding:.5rem 1rem;gap:.5rem;color:var(--accent-text-over);border:1px solid var(--accent-regular);background-color:var(--accent-regular);border-radius:999rem;font-size:var(--text-md);line-height:1.35;white-space:nowrap}
+header[data-astro-cid-qwekciqp]{padding-bottom:2.5rem;border-bottom:1px solid var(--gray-800)}.back-link[data-astro-cid-qwekciqp]{display:none}.details[data-astro-cid-qwekciqp]{display:flex;flex-direction:column;padding:.5rem;gap:1.5rem;justify-content:space-between;align-items:center}.tags[data-astro-cid-qwekciqp]{display:flex;gap:.5rem}.description[data-astro-cid-qwekciqp]{font-size:var(--text-lg);max-width:54ch}.content[data-astro-cid-qwekciqp]{max-width:65ch;margin-inline:auto}.content[data-astro-cid-qwekciqp]>*+*{margin-top:1rem}.content[data-astro-cid-qwekciqp] h1,.content[data-astro-cid-qwekciqp] h2,.content[data-astro-cid-qwekciqp] h3,.content[data-astro-cid-qwekciqp] h4,.content[data-astro-cid-qwekciqp] h5{margin:1.5rem 0}.content[data-astro-cid-qwekciqp] img{border-radius:1.5rem;box-shadow:var(--shadow-sm);background:var(--gradient-subtle);border:1px solid var(--gray-800)}.content[data-astro-cid-qwekciqp] blockquote{font-size:var(--text-lg);font-family:var(--font-brand);font-weight:600;line-height:1.1;padding-inline-start:1.5rem;border-inline-start:.25rem solid var(--accent-dark);color:var(--gray-0)}.back-link[data-astro-cid-qwekciqp],.content[data-astro-cid-qwekciqp] a{text-decoration:1px solid underline transparent;text-underline-offset:.25em;transition:text-decoration-color var(--theme-transition)}.back-link[data-astro-cid-qwekciqp]:hover,.back-link[data-astro-cid-qwekciqp]:focus,.content[data-astro-cid-qwekciqp] a:hover,.content[data-astro-cid-qwekciqp] a:focus{text-decoration-color:currentColor}@media(min-width:50em){.back-link[data-astro-cid-qwekciqp]{display:block;align-self:flex-start}.details[data-astro-cid-qwekciqp]{flex-direction:row;gap:2.5rem}.content[data-astro-cid-qwekciqp] blockquote{font-size:var(--text-2xl)}}
+</style></head> <body data-astro-cid-37fxchfa> <div class="stack backgrounds" data-astro-cid-37fxchfa> <nav data-astro-cid-dmqpwcec> <div class="menu-header" data-astro-cid-dmqpwcec> <a href="/" class="site-title" data-astro-cid-dmqpwcec> <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 256 256" aria-hidden="true" stroke="url(#icon-gradient-v9okwpmi)" fill="url(#icon-gradient-v9okwpmi)" style="--size:1.6em" class="astro-patnjmll" data-astro-cid-patnjmll> <g data-astro-cid-patnjmll><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="16" d="m80 96 40 32-40 32m56 0h40"/><rect width="192" height="160" x="32" y="48" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="16.97" rx="8.5"/></g> <linearGradient id="icon-gradient-v9okwpmi" x1="23" x2="235" y1="43" y2="202" gradientUnits="userSpaceOnUse" data-astro-cid-patnjmll> <stop stop-color="var(--gradient-stop-1)" data-astro-cid-patnjmll></stop> <stop offset=".5" stop-color="var(--gradient-stop-2)" data-astro-cid-patnjmll></stop> <stop offset="1" stop-color="var(--gradient-stop-3)" data-astro-cid-patnjmll></stop> </linearGradient> </svg> 
+Jan Koch
+</a> <menu-button data-astro-cid-dmqpwcec="true"> <template data-astro-cid-dmqpwcec> <button class="menu-button" aria-expanded="false" data-astro-cid-dmqpwcec> <span class="sr-only" data-astro-cid-dmqpwcec>Menu</span> <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 256 256" aria-hidden="true" stroke="currentcolor" fill="currentcolor" class="astro-patnjmll" data-astro-cid-patnjmll> <g data-astro-cid-patnjmll><path stroke-linecap="round" stroke-linejoin="round" stroke-width="16" d="M40 128h176M40 64h176M40 192h176"/></g>  </svg>  </button> </template> </menu-button> </div> <noscript> <ul class="nav-items" data-astro-cid-dmqpwcec> <li data-astro-cid-dmqpwcec> <a class="link" href="/" data-astro-cid-dmqpwcec> Home </a> </li><li data-astro-cid-dmqpwcec> <a aria-current="page" class="link" href="/work/" data-astro-cid-dmqpwcec> Projects </a> </li><li data-astro-cid-dmqpwcec> <a class="link" href="/about/" data-astro-cid-dmqpwcec> About </a> </li> </ul> </noscript> <noscript> <div class="menu-footer" data-astro-cid-dmqpwcec> <div class="socials" data-astro-cid-dmqpwcec> <a href="https://github.com/theotrama" class="social" data-astro-cid-dmqpwcec> <span class="sr-only" data-astro-cid-dmqpwcec>GitHub</span> <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 256 256" aria-hidden="true" stroke="currentcolor" fill="currentcolor" class="astro-patnjmll" data-astro-cid-patnjmll> <g data-astro-cid-patnjmll><g stroke-linecap="round" stroke-linejoin="round"><path fill="none" stroke-width="14.7" d="M55.7 167.2c13.9 1 21.3 13.1 22.2 14.6 4.2 7.2 10.4 9.6 18.3 7.1l1.1-3.4a60.3 60.3 0 0 1-25.8-11.9c-12-10.1-18-25.6-18-46.3"/><path fill="none" stroke-width="16" d="M61.4 205.1a24.5 24.5 0 0 1-3-6.1c-3.2-7.9-7.1-10.6-7.8-11.1l-1-.6c-2.4-1.6-9.5-6.5-7.2-13.9 1.4-4.5 6-7.2 12.3-7.2h.8c4 .3 7.6 1.5 10.7 3.2-9.1-10.1-13.6-24.3-13.6-42.3 0-11.3 3.5-21.7 10.1-30.4A46.7 46.7 0 0 1 65 67.3a8.3 8.3 0 0 1 5-4.7c2.8-.9 13.3-2.7 33.2 9.9a105 105 0 0 1 50.5 0c19.9-12.6 30.4-10.8 33.2-9.9 2.3.7 4.1 2.4 5 4.7 5 12.7 4 23.2 2.6 29.4 6.7 8.7 10 18.9 10 30.4 0 42.6-25.8 54.7-43.6 58.7 1.4 4.1 2.2 8.8 2.2 13.7l-.1 23.4v2.3"/><path fill="none" stroke-width="16" d="M160.9 185.7c1.4 4.1 2.2 8.8 2.2 13.7l-.1 23.4v2.3A98.6 98.6 0 1 0 61.4 205c-1.4-2.1-11.3-17.5-11.8-17.8-2.4-1.6-9.5-6.5-7.2-13.9 1.4-4.5 6-7.2 12.3-7.2h.8c4 .3 7.6 1.5 10.7 3.2-9.1-10.1-13.6-24.3-13.6-42.3 0-11.3 3.5-21.7 10.1-30.4A46.4 46.4 0 0 1 65 67.3a8.3 8.3 0 0 1 5-4.7c2.8-.9 13.3-2.7 33.2 9.9a105 105 0 0 1 50.5 0c19.9-12.6 30.4-10.8 33.2-9.9 2.3.7 4.1 2.4 5 4.7 5 12.7 4 23.2 2.6 29.4 6.7 8.7 10 18.9 10 30.4.1 42.6-25.8 54.7-43.6 58.6z"/><path fill="none" stroke-width="18.7" d="m170.1 203.3 17.3-12 17.2-18.7 9.5-26.6v-27.9l-9.5-27.5" /><path fill="none" stroke-width="22.7" d="m92.1 57.3 23.3-4.6 18.7-1.4 29.3 5.4m-110 32.6-8 16-4 21.4.6 20.3 3.4 13" /><path fill="none" stroke-width="13.3" d="M28.8 133a100 100 0 0 0 66.9 94.4v-8.7c-22.4 1.8-33-11.5-35.6-19.8-3.4-8.6-7.8-11.4-8.5-11.8"/></g></g>  </svg>  </a> </div> </div> </noscript> <div id="menu-content" hidden data-astro-cid-dmqpwcec> <ul class="nav-items" data-astro-cid-dmqpwcec> <li data-astro-cid-dmqpwcec> <a class="link" href="/" data-astro-cid-dmqpwcec> Home </a> </li><li data-astro-cid-dmqpwcec> <a aria-current="page" class="link" href="/work/" data-astro-cid-dmqpwcec> Projects </a> </li><li data-astro-cid-dmqpwcec> <a class="link" href="/about/" data-astro-cid-dmqpwcec> About </a> </li> </ul> <div class="menu-footer" data-astro-cid-dmqpwcec> <div class="socials" data-astro-cid-dmqpwcec> <a href="https://github.com/theotrama" class="social" data-astro-cid-dmqpwcec> <span class="sr-only" data-astro-cid-dmqpwcec>GitHub</span> <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 256 256" aria-hidden="true" stroke="currentcolor" fill="currentcolor" class="astro-patnjmll" data-astro-cid-patnjmll> <g data-astro-cid-patnjmll><g stroke-linecap="round" stroke-linejoin="round"><path fill="none" stroke-width="14.7" d="M55.7 167.2c13.9 1 21.3 13.1 22.2 14.6 4.2 7.2 10.4 9.6 18.3 7.1l1.1-3.4a60.3 60.3 0 0 1-25.8-11.9c-12-10.1-18-25.6-18-46.3"/><path fill="none" stroke-width="16" d="M61.4 205.1a24.5 24.5 0 0 1-3-6.1c-3.2-7.9-7.1-10.6-7.8-11.1l-1-.6c-2.4-1.6-9.5-6.5-7.2-13.9 1.4-4.5 6-7.2 12.3-7.2h.8c4 .3 7.6 1.5 10.7 3.2-9.1-10.1-13.6-24.3-13.6-42.3 0-11.3 3.5-21.7 10.1-30.4A46.7 46.7 0 0 1 65 67.3a8.3 8.3 0 0 1 5-4.7c2.8-.9 13.3-2.7 33.2 9.9a105 105 0 0 1 50.5 0c19.9-12.6 30.4-10.8 33.2-9.9 2.3.7 4.1 2.4 5 4.7 5 12.7 4 23.2 2.6 29.4 6.7 8.7 10 18.9 10 30.4 0 42.6-25.8 54.7-43.6 58.7 1.4 4.1 2.2 8.8 2.2 13.7l-.1 23.4v2.3"/><path fill="none" stroke-width="16" d="M160.9 185.7c1.4 4.1 2.2 8.8 2.2 13.7l-.1 23.4v2.3A98.6 98.6 0 1 0 61.4 205c-1.4-2.1-11.3-17.5-11.8-17.8-2.4-1.6-9.5-6.5-7.2-13.9 1.4-4.5 6-7.2 12.3-7.2h.8c4 .3 7.6 1.5 10.7 3.2-9.1-10.1-13.6-24.3-13.6-42.3 0-11.3 3.5-21.7 10.1-30.4A46.4 46.4 0 0 1 65 67.3a8.3 8.3 0 0 1 5-4.7c2.8-.9 13.3-2.7 33.2 9.9a105 105 0 0 1 50.5 0c19.9-12.6 30.4-10.8 33.2-9.9 2.3.7 4.1 2.4 5 4.7 5 12.7 4 23.2 2.6 29.4 6.7 8.7 10 18.9 10 30.4.1 42.6-25.8 54.7-43.6 58.6z"/><path fill="none" stroke-width="18.7" d="m170.1 203.3 17.3-12 17.2-18.7 9.5-26.6v-27.9l-9.5-27.5" /><path fill="none" stroke-width="22.7" d="m92.1 57.3 23.3-4.6 18.7-1.4 29.3 5.4m-110 32.6-8 16-4 21.4.6 20.3 3.4 13" /><path fill="none" stroke-width="13.3" d="M28.8 133a100 100 0 0 0 66.9 94.4v-8.7c-22.4 1.8-33-11.5-35.6-19.8-3.4-8.6-7.8-11.4-8.5-11.8"/></g></g>  </svg>  </a> </div> <div class="theme-toggle" data-astro-cid-dmqpwcec> <theme-toggle data-astro-cid-x3pjskd3="true"> <button data-astro-cid-x3pjskd3> <span class="sr-only" data-astro-cid-x3pjskd3>Dark theme</span> <span class="icon light" data-astro-cid-x3pjskd3><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 256 256" aria-hidden="true" stroke="currentcolor" fill="currentcolor" class="astro-patnjmll" data-astro-cid-patnjmll> <g data-astro-cid-patnjmll><circle cx="128" cy="128" r="60" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="16" d="M128 36V16M63 63 49 49m-13 79H16m47 65-14 14m79 13v20m65-47 14 14m13-79h20m-47-65 14-14"/></g>  </svg> </span> <span class="icon dark" data-astro-cid-x3pjskd3><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 256 256" aria-hidden="true" stroke="currentcolor" fill="currentcolor" class="astro-patnjmll" data-astro-cid-patnjmll> <g data-astro-cid-patnjmll><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="16" d="M216 112V64m24 24h-48m-24-64v32m16-16h-32m65 113A92 92 0 0 1 103 39h0a92 92 0 1 0 114 114Z"/></g>  </svg> </span> </button> </theme-toggle>  <script type="module">class n extends HTMLElement{constructor(){super();const e=this.querySelector("button"),t=s=>{document.documentElement.classList[s?"add":"remove"]("theme-dark"),e.setAttribute("aria-pressed",String(s))};e.addEventListener("click",()=>t(!this.isDark())),t(this.isDark())}isDark(){return document.documentElement.classList.contains("theme-dark")}}customElements.define("theme-toggle",n);</script> </div> </div> </div> </nav> <script type="module">class i extends HTMLElement{constructor(){super(),this.appendChild(this.querySelector("template").content.cloneNode(!0));const n=this.querySelector("button"),t=document.getElementById("menu-content");t.hidden=!0,t.classList.add("menu-content");const d=e=>{n.setAttribute("aria-expanded",e?"true":"false"),t.hidden=!e};n.addEventListener("click",()=>d(t.hidden));const s=e=>{d(e.matches),n.hidden=e.matches},c=window.matchMedia("(min-width: 50em)");s(c),c.addEventListener("change",s)}}customElements.define("menu-button",i);</script>   <div class="stack gap-20" data-astro-cid-qwekciqp> <div class="stack gap-15" data-astro-cid-qwekciqp> <header data-astro-cid-qwekciqp> <div class="wrapper stack gap-2" data-astro-cid-qwekciqp> <a class="back-link" href="/work/" data-astro-cid-qwekciqp><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 256 256" aria-hidden="true" stroke="currentcolor" fill="currentcolor" class="astro-patnjmll" data-astro-cid-patnjmll> <g data-astro-cid-patnjmll><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="16" d="M216 128H40m72-72-72 72 72 72"/></g>  </svg>  Work</a> <div class="hero stack gap-4 start" data-astro-cid-bbe6dxrz> <div class="stack gap-2" data-astro-cid-bbe6dxrz> <h1 class="title" data-astro-cid-bbe6dxrz>Baby, lemme alloc</h1>  </div>  <div class="details" data-astro-cid-qwekciqp> <div class="tags" data-astro-cid-qwekciqp> <div class="pill" data-astro-cid-2qeywk4b>Low-level</div>  </div> <p class="description" data-astro-cid-qwekciqp>How I stopped fearing malloc and learned to love the heap.
+</p> </div>  </div>  </div> </header> <main class="wrapper" data-astro-cid-qwekciqp> <div class="stack gap-10 content" data-astro-cid-qwekciqp> <img src="/assets/stock-1.jpg" alt="Iridescent ripples of a bright blue and pink liquid" data-astro-cid-qwekciqp> <div class="content" data-astro-cid-qwekciqp> <a href="https://github.com/theotrama/my-malloc" target="_blank" rel="noopener noreferrer">
+  View on GitHub
+</a>
+<p>I recently set off on a journey to deepen my fundamental understanding of computers. As part of that process I decided to write code only in the C programming language for a while.
+Like many developers, I used to be afraid of pointers. And of course of <code>malloc</code>. Once I understood how pointers actually work,
+they started to make sense. But the heap and manual memory management? That still felt like black magic. Whenever I used <code>malloc</code>, <code>realloc</code> or <code>free</code> in my programs,
+I sort of knew what to do, but I didn’t fully grasp what was happening behind the scenes.
+Thus, I started my journey into understanding the theory behind dynamic memory allocation and how glibc implements <code>malloc</code>.
+That led me down the rabbit hole of writing my own basic memory allocator which I am pretty proud of.
+There’s already an amazing book that covers this topic, <em>Computer Systems: A Programmer’s Perspective</em> (CS:APP).
+Still, I think my explanation can help understand the theory behind simple memory management. And honestly once you have grasped the concept
+you might not be able to write your own production grade <code>malloc</code> implementation but your understanding of what happens behind the scene will greatly improve.
+You’ll have a much better intuition for what’s really happening when you call <code>malloc</code> or <code>free</code> in C.
+In this short article I will cover two strategies for allocating and managing memory that build on each other.  I will start with an implicit free list (copying the implementation of CS:APP),
+then bolt an explicit free list on it (for faster access). For the explicit free list I will also provide the code. In the next article, I will then focus on <code>malloc</code> and explain it conceptually.
+For now, let’s start with the simplest one.</p>
+<h2 id="implicit-free-lists">Implicit Free Lists</h2>
+<p>These are the most basic implementation of a memory allocator. Their name comes from the fact that from any block you can implicitly determine
+where the next and previous blocks are located. Each block consists of a <strong>header</strong>, <strong>payload</strong>, and <strong>footer</strong>.
+The header and footer store metadata about the block - specifically its <strong>size</strong> and whether it’s <strong>allocated</strong>.</p>
+<p>With that information you can traverse the memory like a linked list. From each block you can jump to its predecessor and successor by adding or subtracting the size of the next or previous block.
+Let’s make this more tangible and show it with an example. Below Figure 1 shows the simplest possible state of an implicit free list.
+It features only the prologue and epilogue blocks and a 4 byte alignment padding at the start.
+The prologue header’s total size is 8 bytes, and it’s allocated flag is set to 1. The epilogue header’s size is set to 0 and its allocated flag is set to 1.</p>
+<figure id="figure-1">
+  <img src="../../../public/assets/diagrams/explicit-free-list/implicit_free_list.svg" alt="Basic implicit free list">
+  <figcaption><em>Figure 1: The most basic implicit free list</em></figcaption>
+</figure>
+<br><br>
+<h3 id="extending-the-heap-allocating-and-freeing-memory">Extending the Heap, Allocating, and Freeing Memory</h3>
+<p>At this point our free list doesn’t help us allocate memory. Right now the whole space of the list is taken up.
+This is when we need to extend our heap. We initialized it with a size of 16 bytes. Now, we extend the heap by another 64 bytes to make space for user data.
+Now can you guess how our list will look like? Exactly, now we have one more block but this time its allocated flag is set to 0 as it is still free (Figure 2).</p>
+<figure id="figure-2">
+  <img src="../../../public/assets/diagrams/explicit-free-list/implicit_free_list-state-1.svg" alt="implicit free list">
+  <figcaption><em>Figure 2: An implicit free list with a free block</em></figcaption>
+</figure>
+<br><br>
+<p>With that free block available, let us now finally allocate some memory and call <code>malloc(7)</code>. Can you guess how the list will look after this command? Consider that
+each block must reserve space for the header and footer (which are each 4 bytes in size). The total required block size is thus</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>7 (payload) + 4 (header) + 4 (footer) = 15 bytes</span></span></code></pre>
+<p>As our blocks are aligned to be multiples of 8 bytes, we round up to <strong>16 bytes</strong>. Now figure 3 shows our free list:</p>
+<figure id="figure-3">
+  <img src="../../../public/assets/diagrams/explicit-free-list/implicit_free_list-state-2.svg" alt="implicit free list">
+  <figcaption><em>Figure 3: An implicit free list with one allocated and one free block</em></figcaption>
+</figure>
+<br><br>
+<h3 id="implementing-a-simple-allocator">Implementing a Simple Allocator</h3>
+<p>With these concepts, you have everything needed to implement a simple allocator.</p>
+<ol>
+<li>Store the pointer to the first block of the free list called the heap list pointer.</li>
+<li>Traverse the list using the header and footer to find a suitable free block</li>
+<li>When allocating (<code>malloc</code>), mark the chosen block as allocated by setting its flag to 1.</li>
+</ol>
+<p>Common allocation strategies include:</p>
+<ul>
+<li><strong>First fit</strong>: Use the first block that is large enough.</li>
+<li><strong>Next fit</strong>: Similar to first fit, but instead of starting at the beginning of the list we continue where the last search has stopped.</li>
+<li><strong>Best fit</strong>: Find a free block with size closest to that of the requested size.</li>
+</ul>
+<h3 id="freeing-memory-and-coalescing">Freeing Memory and Coalescing</h3>
+<p>All right so now we know how to request a new block, but what if we need to <code>free</code> a block? Well simple: we pass the pointer we want to free to <code>free</code> and set the allocation flag of that block to 0.
+However, there are some edge cases that we need to handle to avoid false fragmentation of the list. We need to ensure that every time we free a block we coalesce it with the previous and next blocks in case these are not allocated.
+This is called  <em>immediate</em> coalescing. In case we clean the fragments up in the background it would be called <em>deferred</em> coalescing.
+Okay so now we coalesce immediately. We have to deal with the following four cases:</p>
+<ol>
+<li>Previous and next blocks are already allocated: easy, we just insert</li>
+<li>Previous block free, next block allocated: Merge with the previous block</li>
+<li>Previous block allocated, next block free: Merge with the next block</li>
+<li>Previous and next block free: Merge with both neighbors</li>
+</ol>
+<p>Figure 4 shows these cases in a real allocation scenario:</p>
+<figure id="figure-4">
+  <img src="../../../public/assets/diagrams/explicit-free-list/implicit_free_list-edge-cases.svg" alt="implicit free list edge cases">
+  <figcaption><em>Figure 4: Edge cases when freeing memory</em></figcaption>
+</figure>
+<br><br>
+<h3 id="handling-large-allocations">Handling Large Allocations</h3>
+<p>With that we have covered all the possible freeing cases. But there is one more case we need to consider. What if we want to <code>malloc</code> a huge chunk of data that our current list cannot fit? Then, we simply request
+more memory from the OS based on the size requested by <code>malloc</code>. Afterward, we need to coalesce as shown in figure 5:</p>
+<figure id="figure-5">
+  <img src="../../../public/assets/diagrams/explicit-free-list/implicit_free_list-request-memory.svg" alt="Request more memory from the OS">
+  <figcaption><em>Figure 5: Request more memory from the OS</em></figcaption>
+</figure>
+<br><br>
+<h3 id="takeaways-for-implicit-free-lists">Takeaways for implicit free lists</h3>
+<p>With that we have all the tools in our hand to build our own implicit list. I highly recommend implementing one yourself, it really helps to understand memory on a lower level. For guidance, check out chapter 9 of CS:APP.
+I followed their implementation at first, copying it into my codebase to understand the details. Then I reimplemented it from scratch, referencing the original only when I got stuck.
+Once comfortable, I added my own explicit free list on top, which made everything really click.</p>
+<p>Next, we’ll explore <strong>explicit free lists</strong>, which improve allocation speed and efficiency.</p>
+<h2 id="explicit-free-lists">Explicit free lists</h2>
+<p>As the name implies these lists are explicit. But why? Well, because while previously we were implicitly traversing our list based on the block sizes
+now we store additional information in our list for the blocks that are free. Basically, we introduce a doubly linked list where each block explicitly knows what its
+previous and next blocks are.</p>
+<h3 id="block-layout-changes">Block layout changes</h3>
+<p>Recall that in an implicit free list each block has a header, a payload, and a footer. For an explicit free list we add two more fields inside the payload of free blocks: <code>prev</code> and <code>next</code>,
+pointing to the previous and next free blocks, respectively.</p>
+<p>The size to store these addresses depends on whether you’re on a 32-bit or a 64-bit system. Nowadays, most modern machines
+are 64-bit, so <code>prev</code>/<code>next</code> are typically 8 bytes each.
+Figure 6 shows a free block in this layout: The prologue and epilogue blocks remain. The only thing that changed is that now each unallocated block holds information about
+its previous and next free blocks. As there are currently no other free blocks available, both <code>prev</code> and <code>next</code> are <code>NULL</code>.</p>
+<figure id="figure-6">
+  <img src="../../../public/assets/diagrams/explicit-free-list/explicit_free_list-block-definition.svg" alt="A block in an explicit free list">
+  <figcaption><em>Figure 6: A block in an explicit free list</em></figcaption>
+</figure>
+<br><br>
+<h3 id="example-allocate-three-blocks-free-two">Example: Allocate three blocks, free two</h3>
+<p>Now, let’s walk through a more complex scenario. In figure 7 you can see that we start again with the exact same list as before. We first <code>malloc</code> three times and then we <code>free</code> two of the previously
+allocated blocks. When calling <code>free</code> we add them to our free list.</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">void</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8">p1 </span><span style="color:#F97583">=</span><span style="color:#B392F0"> malloc</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">8</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">void</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8">p2 </span><span style="color:#F97583">=</span><span style="color:#B392F0"> malloc</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">8</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">void</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8">p3 </span><span style="color:#F97583">=</span><span style="color:#B392F0"> malloc</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">8</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">free</span><span style="color:#E1E4E8">(p1);</span></span>
+<span class="line"><span style="color:#B392F0">free</span><span style="color:#E1E4E8">(p3);</span></span></code></pre>
+<p>So now each time we need to insert a block we don’t need to iterate over the entire list. We just take our explicit free list
+and find the first fit there. This improves our allocation time.</p>
+<figure id="figure-7">
+  <img src="../../../public/assets/diagrams/explicit-free-list/explicit_free_list-case-1.svg" alt="A more complex explicit free list">
+  <figcaption><em>Figure 7: An explicit free list with two free entries</em></figcaption>
+</figure>
+<br><br>
+<h3 id="malloc-with-an-explicit-list"><code>malloc</code> with an explicit list</h3>
+<p>Basically, the code for the underlying implicit list stays the same, but now every time we <code>malloc</code> or <code>free</code> we have to ensure
+that our explicit list stays up to date. For <code>malloc</code> this is pretty straight forward. All we have to do is to remove
+the entry from our free list and ensure that the previous block now points to the next block. And the next block points to the previous block. Let’s also illustrate
+this with a simple graphic in figure 8. We start with the list from figure 7 and now we call <code>malloc(7)</code>. Then we typically:</p>
+<ol>
+<li>Search the explicit free list for the first fit</li>
+<li>Remove the chosen block from the free list</li>
+<li>If there is a free part leftover, we insert it back into the explicit free list</li>
+<li>Update the free list pointer if needed (if we removed the head of the explicit free list)</li>
+</ol>
+<figure id="figure-8">
+  <img src="../../../public/assets/diagrams/explicit-free-list/explicit_free_list-malloc.svg" alt="Removing an element from the free list">
+  <figcaption><em>Figure 8: Removing an element from the free list</em></figcaption>
+</figure>
+<br><br>
+<h3 id="free-and-coalescing-with-an-explicit-free-list"><code>free</code> and coalescing with an explicit free list</h3>
+<p>The more complex cases are again the cases where we free memory. Here, we need to ensure that when we coalesce blocks in the underlying list
+we need to also update our explicit free list. We have exactly the same cases as before. We only need to bolt some more logic onto them for the explicit free list management.</p>
+<ul>
+<li>Case 1 - previous and next blocks are already allocated: easy, we just insert and also insert the new block into the list</li>
+<li>Case 2 - previous block free, next block allocated: Coalesce the new and previous blocks. Nothing else to do. The previous block is already correctly linked in the list.</li>
+<li>Case 3 - previous block allocated, next block free: Coalesce the new and next blocks. Remove the next block from the free list. Insert the current block instead.</li>
+<li>Case 4 - previous and next block free: Coalesce the previous, new and next blocks. Remove the next block from the free list. Update the previous block with the information from the next block.</li>
+</ul>
+<p><strong>Case 1</strong>: previous and next blocks are already allocated. Just insert the new block into the free list and update the free list pointer.</p>
+<figure id="figure-9">
+  <img src="../../../public/assets/diagrams/explicit-free-list/explicit_free_list-case-1.svg" alt="Case 1 - previous and next blocks are allocated">
+  <figcaption><em>Figure 9: Case 1 - previous and next blocks are allocated</em></figcaption>
+</figure>
+<br><br>
+<p><strong>Case 2</strong>: previous block is free and the next block is allocated. This is the simplest case. We only need to coalesce and that’s it. No need to update the explicit free list
+as the previous block is already correctly linked in the list.</p>
+<figure id="figure-10">
+  <img src="../../../public/assets/diagrams/explicit-free-list/explicit_free_list-case-2.svg" alt="Case 2 - previous block free and next block allocated">
+  <figcaption><em>Figure 10: Case 2 - previous block free and next block allocated</em></figcaption>
+</figure>
+<br><br>
+<p><strong>Case 3</strong>: We coalesce the new block with the next block. We thus remove the next block from the free list and then insert the new block. The new block becomes
+our new free list pointer.</p>
+<figure id="figure-11">
+  <img src="../../../public/assets/diagrams/explicit-free-list/explicit_free_list-case-3.svg" alt="Case 3 - previous block allocated and next block free">
+  <figcaption><em>Figure 11: Case 3 - previous block allocated and next block free</em></figcaption>
+</figure>
+<br><br>
+<p><strong>Case 4</strong>: we coalesce the previous block, with the new and the next blocks. We remove the next block from the free list and update the next block pointer of the previous block
+to correctly link to the new next block.</p>
+<figure id="figure-12">
+  <img src="../../../public/assets/diagrams/explicit-free-list/explicit_free_list-case-4.svg" alt="Case 4 - previous and next blocks free">
+  <figcaption><em>Figure 12: Case 4 - previous and next blocks free</em></figcaption>
+</figure>
+<br><br>
+<h2 id="code-base">Code base</h2>
+<p>And with that we have covered all the cases that we need to <code>malloc</code> and <code>free</code>. All the logic for <code>malloc</code> and <code>free</code> lives inside <code>mm.c</code>. My custom methods
+are called <code>mm_malloc</code> and <code>mm_free</code>. To run the project</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">make</span></span>
+<span class="line"><span style="color:#B392F0">./test.out</span><span style="color:#79B8FF"> -d</span></span></code></pre>
+<p>The test driver includes a bunch of test cases and prints out the implicit and explicit free list states before and after each operation. If you want to see
+how the initial heap is requested from the OS, check <code>memlib.c</code>. I use the <code>mmap</code> system call to obtain memory pages from the OS.</p>
+<h2 id="wrapping-up">Wrapping up</h2>
+<p>With explicit free lists you trade a bit of extra per-free-block overhead (the <code>prev</code>/<code>next</code> pointers) for much faster allocation
+searches and easier removal/insert operations. This is a standard stepping stone on the way to production allocators.
+Now we have a working heap allocator that we could use. But, to get to a production grade allocator like <code>malloc</code> from glibc there is still some more conceptual abstraction that we need to understand.
+In the next article I’ll bridge the gap from this explicit free-list allocator to how a real <code>malloc</code> (e.g. glibc)
+organizes bins, uses segregated lists, and optimizes splits/coalesces and large-allocation handling.</p>
+<h1 id="resources">Resources</h1>
+<ul>
+<li>CS:APP - <a href="https://www.cs.sfu.ca/~ashriram/Courses/CS295/assets/books/CSAPP_2016.pdf">https://www.cs.sfu.ca/~ashriram/Courses/CS295/assets/books/CSAPP_2016.pdf</a></li>
+<li>Azeria Labs - <a href="https://azeria-labs.com/heap-exploitation-part-1-understanding-the-glibc-heap-implementation/">https://azeria-labs.com/heap-exploitation-part-1-understanding-the-glibc-heap-implementation/</a></li>
+</ul> </div> </div> </main> </div> </div>  <footer data-astro-cid-sz7xmlte> <div class="group" data-astro-cid-sz7xmlte> <p data-astro-cid-sz7xmlte>
+Designed & Developed in Portland with <a href="https://astro.build/" data-astro-cid-sz7xmlte>Astro</a> <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 256 256" aria-hidden="true" stroke="currentcolor" fill="currentcolor" style="--size:1.2em" class="astro-patnjmll" data-astro-cid-patnjmll> <g data-astro-cid-patnjmll><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="16" d="M94.1 184.6c-11.4 33.9-56.6 33.9-56.6 33.9s0-45.2 33.9-56.6m124.5-56.5L128 173.3 82.7 128l67.9-67.9C176.3 34.4 202 34.7 213 36.3a7.8 7.8 0 0 1 6.7 6.7c1.6 11 1.9 36.7-23.8 62.4Z"/><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="16" d="M184.6 116.7v64.6a8 8 0 0 1-2.4 5.6l-32.3 32.4a8 8 0 0 1-13.5-4.1l-8.4-41.9m11.3-101.9H74.7a8 8 0 0 0-5.6 2.4l-32.4 32.3a8 8 0 0 0 4.1 13.5l41.9 8.4"/></g>  </svg>  </p> <p data-astro-cid-sz7xmlte>&copy; 2025 Jan Koch</p> </div> <p class="socials" data-astro-cid-sz7xmlte> <a href="https://github.com/theotrama" data-astro-cid-sz7xmlte> GitHub</a> </p> </footer>  </div> <script type="module">addEventListener("load",()=>document.documentElement.classList.add("loaded"));</script>  </body> </html> 
