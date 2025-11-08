@@ -1,119 +1,152 @@
 ---
-import ContactCTA from '../components/ContactCTA.astro';
 import Hero from '../components/Hero.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="About | Jeanine White" description="About Jeanine White Lorem Ipsum">
-	<div class="stack gap-20">
-		<main class="wrapper about">
-			<Hero
-				title="About"
-				tagline="Thanks for stopping by. Read below to learn more about myself and my background."
-			>
-				<img
-					width="1553"
-					height="873"
-					src="/assets/at-work.jpg"
-					alt="Jeanine White at work with a colleague"
-				/>
-			</Hero>
+<BaseLayout title="About | Jan Koch" description="About Jan Koch, Senior Backend Engineer">
+    <div class="stack gap-20">
+        <main class="wrapper about">
+            <Hero
+                    title="About"
+                    tagline="Hi, I'm Jan, a senior backend developer specializing in Java, Go, and distributed systems."
+            >
+                <!-- Add back later
+                <img
+                        width="1553"
+                        height="873"
+                        src="/assets/at-work.jpg"
+                        alt="Jan Koch at work with a colleague"
+                />
+                -->
+            </Hero>
 
-			<section>
-				<h2 class="section-title">Background</h2>
-				<div class="content">
-					<p>
-						Lorem ipsum dolor sit amet, <a href="https://astro.build/">Astro</a> makes people happy.
-						Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Proin nibh nisl condimentum
-						id venenatis a condimentum vitae. Dapibus ultrices in iaculis nunc. Arcu odio ut sem nulla
-						pharetra diam sit amet. Diam quis enim lobortis scelerisque fermentum dui faucibus in ornare.
-					</p>
-					<p>
-						Arcu dui vivamus arcu felis bibendum ut tristique et egestas. Eget gravida cum sociis
-						natoque penatibus. Cras fermentum odio eu feugiat pretium nibh. Proin nibh nisl
-						condimentum id venenatis. Porta nibh venenatis cras sed felis eget velit. Id diam vel
-						quam elementum pulvinar etiam non.
-					</p>
-					<p>
-						Ultrices tincidunt arcu non sodales neque sodales ut. Sed enim ut sem viverra aliquet
-						eget sit amet. Lacus luctus accumsan tortor posuere ac ut consequat semper viverra.
-						Viverra accumsan in nisl nisi scelerisque eu ultrices. In massa tempor nec feugiat nisl
-						pretium fusce.
-					</p>
-				</div>
-			</section>
-			<section>
-				<h2 class="section-title">Education</h2>
-				<div class="content">
-					<p>Corporis voluptates tenetur laudantium.</p>
-				</div>
-			</section>
-			<section>
-				<h2 class="section-title">Skills</h2>
-				<div class="content">
-					<p>officia unde omnis</p>
-				</div>
-			</section>
-		</main>
+            <!-- Background -->
+            <section>
+                <h2 class="section-title">Background</h2>
+                <div class="content">
+                    <p>
+                        From building low-level systems in C to designing large-scale distributed applications in Java
+                        and Go, my journey as a backend engineer has been guided by a curiosity for how software truly
+                        works. I thrive on understanding the inner workings of systems, whether it's networking,
+                        performance optimization, or scalable architectures.
+                    </p>
+                    <p>
+                        Over the years, I’ve worked extensively with Spring Boot, Kafka, gRPC, Docker, and Kubernetes,
+                        designing reliable and maintainable systems for real-world challenges. I believe that strong
+                        computer science fundamentals combined with hands-on experience are the key to creating
+                        performant and innovative software.
+                    </p>
+                    <p>
+                        Beyond coding, I enjoy exploring low-level technologies, experimenting with new tools, and
+                        continuously learning ways to build systems that are both robust and elegant. My goal is always
+                        to deliver high-quality solutions that make an impact.
+                    </p>
+                </div>
+            </section>
 
-		<ContactCTA />
-	</div>
+            <!-- Skills -->
+            <section>
+                <h2 class="section-title">Skills</h2>
+                <div class="content">
+                    Languages: Java, Go, Erlang, C<br>
+                    Technologies: Spring, Kafka, gRPC, OpenAPI, Docker, Kubernetes<br>
+                    Strengths: Distributed systems, networking, socket programming
+                </div>
+            </section>
+
+            <!-- Work Experience -->
+            <section>
+                <h2 class="section-title">Work Experience</h2>
+                <div class="content">
+                    <h5>Tech Lead @ Julius Baer — Zurich, Switzerland</h5>
+                    <p> Nov 2022 – Present</p>
+                    <ul>
+                        <li>Led go-live of new enterprise app, full lifecycle ownership.</li>
+                        <li>Designed and implemented scalable backend services in Java (Spring Boot 3, JDK 21).</li>
+                        <li>Introduced API-first development with OpenAPI-driven REST client generation.</li>
+                        <li>Containerized services with Docker & Kubernetes, modernized frontend stack.</li>
+                    </ul>
+                    <br>
+
+                    <h5>Software Engineer @ Rheinmetall Cyber Solutions — Bremen, Germany</h5>
+                    <p>Feb 2021 – Oct 2022</p>
+                    <ul>
+                        <li>Built fault-tolerant Kafka clusters and stream processing pipelines.</li>
+                        <li>Improved distributed transaction system throughput and reliability.</li>
+                        <li>Defined gRPC service contracts and implemented backend services in Spring Boot.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Education -->
+            <section>
+                <h2 class="section-title">Education</h2>
+                <div class="content">
+                    <h5>M.Sc. Mechanical Engineering @ Technical University of Munich</h5>
+                    <p>Apr 2017 – Apr 2020</p>
+                    <br>
+                    <h5>B.Sc. Mechanical Engineering @ Technical University of Munich</h5>
+                    <p>Oct 2013 – Apr 2017</p>
+                </div>
+            </section>
+
+        </main>
+    </div>
 </BaseLayout>
 
 <style>
-	.about {
-		display: flex;
-		flex-direction: column;
-		gap: 3.5rem;
-	}
+    .about {
+        display: flex;
+        flex-direction: column;
+        gap: 3.5rem;
+    }
 
-	img {
-		margin-top: 1.5rem;
-		border-radius: 1.5rem;
-		box-shadow: var(--shadow-md);
-	}
+    img {
+        margin-top: 1.5rem;
+        border-radius: 1.5rem;
+        box-shadow: var(--shadow-md);
+    }
 
-	section {
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-		color: var(--gray-200);
-	}
+    section {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        color: var(--gray-200);
+    }
 
-	.section-title {
-		grid-column-start: 1;
-		font-size: var(--text-xl);
-		color: var(--gray-0);
-	}
+    .section-title {
+        font-size: var(--text-xl);
+        color: var(--gray-0);
+    }
 
-	.content {
-		grid-column: 2 / 4;
-	}
+    .content {
+        grid-column: 2 / 4;
+    }
 
-	.content :global(a) {
-		text-decoration: 1px solid underline transparent;
-		text-underline-offset: 0.25em;
-		transition: text-decoration-color var(--theme-transition);
-	}
+    .content :global(a) {
+        text-decoration: underline;
+        text-underline-offset: 0.25em;
+        transition: text-decoration-color var(--theme-transition);
+    }
 
-	.content :global(a:hover),
-	.content :global(a:focus) {
-		text-decoration-color: currentColor;
-	}
+    .content :global(a:hover),
+    .content :global(a:focus) {
+        text-decoration-color: currentColor;
+    }
 
-	@media (min-width: 50em) {
-		.about {
-			display: grid;
-			grid-template-columns: 1fr 60% 1fr;
-		}
+    @media (min-width: 50em) {
+        .about {
+            display: grid;
+            grid-template-columns: 1fr 60% 1fr;
+        }
 
-		.about > :global(:first-child) {
-			grid-column-start: 2;
-		}
+        .about > :global(:first-child) {
+            grid-column-start: 2;
+        }
 
-		section {
-			display: contents;
-			font-size: var(--text-lg);
-		}
-	}
+        section {
+            display: contents;
+            font-size: var(--text-lg);
+        }
+    }
 </style>
