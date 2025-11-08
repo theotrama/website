@@ -16,6 +16,8 @@ const projects = (await getCollection('work'))
     .sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf())
     .slice(0, 4);
 
+const base = import.meta.env.BASE_URL;
+
 // Full Astro Component Syntax:
 // https://docs.astro.build/basics/astro-components/
 ---
@@ -75,7 +77,7 @@ const projects = (await getCollection('work'))
                 </div>
 
                 <div class="cta">
-                    <CallToAction href="/work/">
+                    <CallToAction href=`${base}/work`>
                         View All
                         <Icon icon="arrow-right" size="1.2em"/>
                     </CallToAction>
