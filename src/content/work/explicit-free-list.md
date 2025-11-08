@@ -92,7 +92,7 @@ Okay so now we coalesce immediately. We have to deal with the following four cas
 
 Figure 4 shows these cases in a real allocation scenario:
 <figure id="figure-4">
-  <img src="./assets/diagrams/explicit-free-list/implicit_free_list-edge-cases.svg" alt="implicit free list edge cases">
+  <img src="../../assets/diagrams/explicit-free-list/implicit_free_list-edge-cases.svg" alt="implicit free list edge cases">
   <figcaption><em>Figure 4: Edge cases when freeing memory</em></figcaption>
 </figure>
 <br><br>
