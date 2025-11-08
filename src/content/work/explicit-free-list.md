@@ -1,7 +1,7 @@
 ---
 title: Baby, lemme alloc
 publishDate: 2025-11-08 10:00:00
-img: /assets/stock-1.jpg
+img: /website/assets/stock-1.jpg
 img_alt: Iridescent ripples of a bright blue and pink liquid
 description: |
   How I stopped fearing malloc and learned to love the heap.

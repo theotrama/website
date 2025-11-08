@@ -1,7 +1,7 @@
 ---
 title: Writing your own VPN implementation in Go
 publishDate: 2025-10-06 10:00:00
-img: /assets/stock-2.jpg
+img: /website/assets/stock-2.jpg
 img_alt: A bright pink sheet of paper used to wrap flowers curves in front of rich blue background
 description: |
   A minimal VPN implementation in Go using TUN devices, demonstrating packet tunneling, routing, and basic UDP communication.

@@ -1,7 +1,7 @@
 ---
 title: Resolving juliusbaer.com with my own DNS resolver
 publishDate: 2024-11-23 10:00:00
-img: /assets/stock-1.jpg
+img: /website/assets/stock-1.jpg
 img_alt: Iridescent ripples of a bright blue and pink liquid
 description: |
   Recursive DNS resolver in Erlang.
