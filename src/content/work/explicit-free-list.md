@@ -38,7 +38,7 @@ It features only the prologue and epilogue blocks and a 4 byte alignment padding
 The prologue header's total size is 8 bytes, and it's allocated flag is set to 1. The epilogue header's size is set to 0 and its allocated flag is set to 1.
 
 <figure id="figure-1">
-  <img src="./website/assets/diagrams/explicit-free-list/implicit_free_list.svg" alt="Basic implicit free list">
+  <img src="../../assets/diagrams/explicit-free-list/implicit_free_list.svg" alt="Basic implicit free list">
   <figcaption><em>Figure 1: The most basic implicit free list</em></figcaption>
 </figure>
 <br><br>
@@ -49,7 +49,7 @@ This is when we need to extend our heap. We initialized it with a size of 16 byt
 Now can you guess how our list will look like? Exactly, now we have one more block but this time its allocated flag is set to 0 as it is still free (Figure 2).
 
 <figure id="figure-2">
-  <img src="./website/assets/diagrams/explicit-free-list/implicit_free_list-state-1.svg" alt="implicit free list">
+  <img src="../../assets/diagrams/explicit-free-list/implicit_free_list-state-1.svg" alt="implicit free list">
   <figcaption><em>Figure 2: An implicit free list with a free block</em></figcaption>
 </figure>
 <br><br>
@@ -63,7 +63,7 @@ each block must reserve space for the header and footer (which are each 4 bytes 
 As our blocks are aligned to be multiples of 8 bytes, we round up to **16 bytes**. Now figure 3 shows our free list:
 
 <figure id="figure-3">
-  <img src="./website/assets/diagrams/explicit-free-list/implicit_free_list-state-2.svg" alt="implicit free list">
+  <img src="../../assets/diagrams/explicit-free-list/implicit_free_list-state-2.svg" alt="implicit free list">
   <figcaption><em>Figure 3: An implicit free list with one allocated and one free block</em></figcaption>
 </figure>
 <br><br>
@@ -102,7 +102,7 @@ With that we have covered all the possible freeing cases. But there is one more 
 more memory from the OS based on the size requested by `malloc`. Afterward, we need to coalesce as shown in figure 5:
 
 <figure id="figure-5">
-  <img src="./website/assets/diagrams/explicit-free-list/implicit_free_list-request-memory.svg" alt="Request more memory from the OS">
+  <img src="../../assets/diagrams/explicit-free-list/implicit_free_list-request-memory.svg" alt="Request more memory from the OS">
   <figcaption><em>Figure 5: Request more memory from the OS</em></figcaption>
 </figure>
 <br><br>
@@ -130,7 +130,7 @@ are 64-bit, so `prev`/`next` are typically 8 bytes each.
 Figure 6 shows a free block in this layout: The prologue and epilogue blocks remain. The only thing that changed is that now each unallocated block holds information about
 its previous and next free blocks. As there are currently no other free blocks available, both `prev` and `next` are `NULL`.
 <figure id="figure-6">
-  <img src="./website/assets/diagrams/explicit-free-list/explicit_free_list-block-definition.svg" alt="A block in an explicit free list">
+  <img src="../../assets/diagrams/explicit-free-list/explicit_free_list-block-definition.svg" alt="A block in an explicit free list">
   <figcaption><em>Figure 6: A block in an explicit free list</em></figcaption>
 </figure>
 <br><br>
@@ -150,7 +150,7 @@ So now each time we need to insert a block we don't need to iterate over the ent
 and find the first fit there. This improves our allocation time.
 
 <figure id="figure-7">
-  <img src="./website/assets/diagrams/explicit-free-list/explicit_free_list-case-1.svg" alt="A more complex explicit free list">
+  <img src="../../assets/diagrams/explicit-free-list/explicit_free_list-case-1.svg" alt="A more complex explicit free list">
   <figcaption><em>Figure 7: An explicit free list with two free entries</em></figcaption>
 </figure>
 <br><br>
@@ -166,7 +166,7 @@ this with a simple graphic in figure 8. We start with the list from figure 7 and
 4. Update the free list pointer if needed (if we removed the head of the explicit free list)
 
 <figure id="figure-8">
-  <img src="./website/assets/diagrams/explicit-free-list/explicit_free_list-malloc.svg" alt="Removing an element from the free list">
+  <img src="../../assets/diagrams/explicit-free-list/explicit_free_list-malloc.svg" alt="Removing an element from the free list">
   <figcaption><em>Figure 8: Removing an element from the free list</em></figcaption>
 </figure>
 <br><br>
@@ -182,7 +182,7 @@ we need to also update our explicit free list. We have exactly the same cases as
 
 **Case 1**: previous and next blocks are already allocated. Just insert the new block into the free list and update the free list pointer.
 <figure id="figure-9">
-  <img src="./website/assets/diagrams/explicit-free-list/explicit_free_list-case-1.svg" alt="Case 1 - previous and next blocks are allocated">
+  <img src="../../assets/diagrams/explicit-free-list/explicit_free_list-case-1.svg" alt="Case 1 - previous and next blocks are allocated">
   <figcaption><em>Figure 9: Case 1 - previous and next blocks are allocated</em></figcaption>
 </figure>
 <br><br>
@@ -192,7 +192,7 @@ we need to also update our explicit free list. We have exactly the same cases as
 as the previous block is already correctly linked in the list.
 
 <figure id="figure-10">
-  <img src="./website/assets/diagrams/explicit-free-list/explicit_free_list-case-2.svg" alt="Case 2 - previous block free and next block allocated">
+  <img src="../../assets/diagrams/explicit-free-list/explicit_free_list-case-2.svg" alt="Case 2 - previous block free and next block allocated">
   <figcaption><em>Figure 10: Case 2 - previous block free and next block allocated</em></figcaption>
 </figure>
 <br><br>
@@ -200,7 +200,7 @@ as the previous block is already correctly linked in the list.
 **Case 3**: We coalesce the new block with the next block. We thus remove the next block from the free list and then insert the new block. The new block becomes
 our new free list pointer.
 <figure id="figure-11">
-  <img src="./website/assets/diagrams/explicit-free-list/explicit_free_list-case-3.svg" alt="Case 3 - previous block allocated and next block free">
+  <img src="../../assets/diagrams/explicit-free-list/explicit_free_list-case-3.svg" alt="Case 3 - previous block allocated and next block free">
   <figcaption><em>Figure 11: Case 3 - previous block allocated and next block free</em></figcaption>
 </figure>
 <br><br>
@@ -208,7 +208,7 @@ our new free list pointer.
 **Case 4**: we coalesce the previous block, with the new and the next blocks. We remove the next block from the free list and update the next block pointer of the previous block
 to correctly link to the new next block.
 <figure id="figure-12">
-  <img src="./website/assets/diagrams/explicit-free-list/explicit_free_list-case-4.svg" alt="Case 4 - previous and next blocks free">
+  <img src="../../assets/diagrams/explicit-free-list/explicit_free_list-case-4.svg" alt="Case 4 - previous and next blocks free">
   <figcaption><em>Figure 12: Case 4 - previous and next blocks free</em></figcaption>
 </figure>
 <br><br>

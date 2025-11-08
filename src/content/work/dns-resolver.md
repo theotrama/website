@@ -54,14 +54,14 @@ which
 you can see in the figure below.
 
 <figure id="figure-1">
-  <img src="./website/assets/diagrams/dns-resolver/protocol.svg" alt="DNS protocol">
+  <img src="../../assets/diagrams/dns-resolver/protocol.svg" alt="DNS protocol">
   <figcaption>Figure 1: The DNS protocol</figcaption>
 </figure>
 
 So the first query for juliusbaer.com to one of the root DNS servers would look like this.
 
 <figure>
-  <img src="./website/assets/diagrams/dns-resolver/juliusbaer_dns_request.svg" alt="DNS protocol">
+  <img src="../../assets/diagrams/dns-resolver/juliusbaer_dns_request.svg" alt="DNS protocol">
   <figcaption>Figure 2: A DNS request for juliusbaer.com</figcaption>
 </figure>
 
@@ -70,7 +70,7 @@ we get back the authoritative name server for the
 juliusbaer.com domain and in the additional record we get the IP address of this name server.
 
 <figure>
-  <img src="./website/assets/diagrams/dns-resolver/juliusbaer_dns_response.svg" alt="DNS protocol">
+  <img src="../../assets/diagrams/dns-resolver/juliusbaer_dns_response.svg" alt="DNS protocol">
   <figcaption>Figure 3: A DNS response for juliusbaer.com</figcaption>
 </figure>
 
@@ -103,7 +103,7 @@ correct run `nslookup juliusbaer.com` in your favorite terminal. For the full pr
 diagram below. Here you can see the full process in detail.
 
 <figure>
-  <img src="./website/assets/diagrams/dns-resolver/dns_process.svg" alt="DNS resolution process">
+  <img src="../../assets/diagrams/dns-resolver/dns_process.svg" alt="DNS resolution process">
   <figcaption>Figure 4: The process of DNS resolution for juliusbaer.com</figcaption>
 </figure>
 

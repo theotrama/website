@@ -139,7 +139,7 @@ On the way back, the client reads the UDP data, writes it to tun5, and the kerne
 socket connection — completing the round trip.
 
 <figure id="figure-2">
-  <img src="./website/assets/diagrams/custom-vpn/tunnel.svg" alt="Detailed flow">
+  <img src="../../assets/diagrams/custom-vpn/tunnel.svg" alt="Detailed flow">
   <figcaption>Figure 2: Detailed flow of a packet in a VPN tunnel with TUN devices</figcaption>
 </figure>
 
